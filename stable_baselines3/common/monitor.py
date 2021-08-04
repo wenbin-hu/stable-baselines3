@@ -49,7 +49,7 @@ class Monitor(gym.Wrapper):
                     filename = filename + "." + Monitor.EXT
             self.file_handler = open(filename, "wt")
             self.file_handler.write("#%s\n" % json.dumps({"t_start": self.t_start, "env_id": env.spec and env.spec.id}))
-            self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t", "rd", "re", "rc") + reset_keywords + info_keywords)
+            self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t") + reset_keywords + info_keywords)
             self.logger.writeheader()
             self.file_handler.flush()
 
@@ -57,7 +57,6 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.reward_distance, self.reward_euler, self.reward_contact = None, None, None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_lengths = []
@@ -78,7 +77,6 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.reward_distance, self.reward_euler, self.reward_contact = [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
@@ -98,19 +96,11 @@ class Monitor(gym.Wrapper):
             raise RuntimeError("Tried to step environment that needs reset")
         observation, reward, done, info = self.env.step(action)
         self.rewards.append(reward)
-        self.reward_distance.append(info['reward_distance'])
-        self.reward_euler.append(info['reward_euler'])
-        self.reward_contact.append(info['reward_contact'])
         if done:
             self.needs_reset = True
             ep_rew = sum(self.rewards)
             ep_len = len(self.rewards)
-            ep_rewDis = sum(self.reward_distance)
-            ep_rewEu = sum(self.reward_euler)
-            ep_rewCon = sum(self.reward_contact)
-            # ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
-            ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
-                       "rd": round(ep_rewDis, 6), "re": round(ep_rewEu, 6), "rc": round(ep_rewCon, 6)}
+            ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
             self.episode_rewards.append(ep_rew)
