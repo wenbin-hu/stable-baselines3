@@ -99,7 +99,7 @@ class Monitor(gym.Wrapper):
         observation, reward, done, info = self.env.step(action)
         self.rewards.append(reward)
         self.reward_distance.append(info['reward_distance'])
-        self.reward_euler.append(info['reward_euler'])
+        # self.reward_euler.append(info['reward_euler'])
         self.reward_contact.append(info['reward_contact'])
         if done:
             self.needs_reset = True
