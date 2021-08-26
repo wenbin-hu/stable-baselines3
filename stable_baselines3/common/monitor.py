@@ -57,7 +57,7 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.reward_distance, self.reward_euler, self.reward_contact = None, None, None
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque = None, None, None, None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_lengths = []
@@ -78,7 +78,7 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.reward_distance, self.reward_euler, self.reward_contact = [], [], []
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque = [], [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
@@ -101,6 +101,7 @@ class Monitor(gym.Wrapper):
         self.reward_distance.append(info['reward_distance'])
         # self.reward_euler.append(info['reward_euler'])
         self.reward_contact.append(info['reward_contact'])
+        self.reward_torque.append(info['reward_torque'])
         if done:
             self.needs_reset = True
             ep_rew = sum(self.rewards)
@@ -108,9 +109,11 @@ class Monitor(gym.Wrapper):
             ep_rewDis = sum(self.reward_distance)
             ep_rewEu = sum(self.reward_euler)
             ep_rewCon = sum(self.reward_contact)
+            ep_rewTrq = sum(self.reward_torque)
             # ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
-                       "rd": round(ep_rewDis, 6), "re": round(ep_rewEu, 6), "rc": round(ep_rewCon, 6)}
+                       "rd": round(ep_rewDis, 6), "re": round(ep_rewEu, 6), "rc": round(ep_rewCon, 6),
+                       "rt": round(ep_rewTrq, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
             self.episode_rewards.append(ep_rew)
