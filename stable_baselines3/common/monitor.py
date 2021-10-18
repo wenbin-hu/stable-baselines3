@@ -49,7 +49,7 @@ class Monitor(gym.Wrapper):
                     filename = filename + "." + Monitor.EXT
             self.file_handler = open(filename, "wt")
             self.file_handler.write("#%s\n" % json.dumps({"t_start": self.t_start, "env_id": env.spec and env.spec.id}))
-            self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t", "rd", "re", "rc", "rt", "rdot") + reset_keywords + info_keywords)
+            self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t", "rd", "re", "rc", "rt", "rdot", "rf") + reset_keywords + info_keywords)
             self.logger.writeheader()
             self.file_handler.flush()
 
@@ -57,7 +57,7 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque = None, None, None, None
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque, self.reward_fast = None, None, None, None, None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_lengths = []
@@ -103,6 +103,7 @@ class Monitor(gym.Wrapper):
         self.reward_contact.append(info['reward_contact'])
         self.reward_torque.append(info['reward_torque'])
         self.reward_dotproduct.append(info['reward_dotproduct'])
+        self.reward_fast.append(info['reward_fast'])
         if done:
             self.needs_reset = True
             ep_rew = sum(self.rewards)
@@ -112,10 +113,11 @@ class Monitor(gym.Wrapper):
             ep_rewCon = sum(self.reward_contact)
             ep_rewTrq = sum(self.reward_torque)
             ep_rewDot = sum(self.reward_dotproduct)
+            ep_rewFas = sum(self.reward_fast)
             # ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
                        "rd": round(ep_rewDis, 6), "re": round(ep_rewEu, 6), "rc": round(ep_rewCon, 6),
-                       "rt": round(ep_rewTrq, 6), "rdot": round(ep_rewDot, 6)}
+                       "rt": round(ep_rewTrq, 6), "rdot": round(ep_rewDot, 6), "rf": round(ep_rewFas, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
             self.episode_rewards.append(ep_rew)
