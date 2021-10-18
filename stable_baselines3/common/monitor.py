@@ -57,7 +57,7 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque, self.reward_fast = None, None, None, None, None
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque, self.reward_dotproduct, self.reward_fast = None, None, None, None, None, None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_lengths = []
@@ -78,7 +78,7 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque, self.reward_dotproduct = [], [], [], [], []
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_torque, self.reward_dotproduct, self.reward_fast = [], [], [], [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
