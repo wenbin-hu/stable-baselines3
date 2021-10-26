@@ -78,7 +78,7 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity = [], [], [], [], []
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector = [], [], [], [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
