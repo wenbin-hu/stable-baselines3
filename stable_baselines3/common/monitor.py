@@ -57,7 +57,7 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector = None, None, None, None, None, None
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector, self.reward_velvec = None, None, None, None, None, None, None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_lengths = []
@@ -78,7 +78,7 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector = [], [], [], [], [], []
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector, self.reward_velvec = [], [], [], [], [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
@@ -104,6 +104,7 @@ class Monitor(gym.Wrapper):
         self.reward_fast.append(info['reward_fast'])
         self.reward_velocity.append(info['reward_velocity'])
         self.reward_vector.append(info['reward_vector'])
+        self.reward_velvec.append(info['reward_velvec'])
         if done:
             self.needs_reset = True
             ep_rew = sum(self.rewards)
@@ -114,10 +115,12 @@ class Monitor(gym.Wrapper):
             ep_rewFas = sum(self.reward_fast)
             ep_rewVel = sum(self.reward_velocity)
             ep_rewVec = sum(self.reward_vector)
+            ep_rewVV = sum(self.reward_velvec)
             # ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
                        "rd": round(ep_rewDis, 6), "re": round(ep_rewEu, 6), "rc": round(ep_rewCon, 6),
-                        "rf": round(ep_rewFas, 6), "rv": round(ep_rewVel, 6), "rvec": round(ep_rewVec, 6)}
+                        "rf": round(ep_rewFas, 6), "rv": round(ep_rewVel, 6), "rvec": round(ep_rewVec, 6),
+                       "rvv": round(ep_rewVV, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
             self.episode_rewards.append(ep_rew)
