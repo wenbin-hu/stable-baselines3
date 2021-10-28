@@ -49,7 +49,9 @@ class Monitor(gym.Wrapper):
                     filename = filename + "." + Monitor.EXT
             self.file_handler = open(filename, "wt")
             self.file_handler.write("#%s\n" % json.dumps({"t_start": self.t_start, "env_id": env.spec and env.spec.id}))
-            self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t", "rd", "re", "rc", "rf", "rv", "rvec") + reset_keywords + info_keywords)
+            self.logger = csv.DictWriter(self.file_handler,
+                                         fieldnames=("r", "l", "t", "rd", "re", "rc", "rf", "rv", "rvec", "rvv")
+                                                    + reset_keywords + info_keywords)
             self.logger.writeheader()
             self.file_handler.flush()
 
