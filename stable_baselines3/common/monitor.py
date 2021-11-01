@@ -50,7 +50,7 @@ class Monitor(gym.Wrapper):
             self.file_handler = open(filename, "wt")
             self.file_handler.write("#%s\n" % json.dumps({"t_start": self.t_start, "env_id": env.spec and env.spec.id}))
             self.logger = csv.DictWriter(self.file_handler,
-                                         fieldnames=("r", "l", "t", "rd", "re", "rc", "rf", "rv", "rvec", "rvv")
+                                         fieldnames=("r", "l", "t", "rd", "re", "rc", "rf", "rv", "rvec", "rvv", "racc")
                                                     + reset_keywords + info_keywords)
             self.logger.writeheader()
             self.file_handler.flush()
@@ -59,7 +59,7 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector, self.reward_velvec = None, None, None, None, None, None, None
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector, self.reward_velvec, self.reward_acc = None, None, None, None, None, None, None, None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_lengths = []
@@ -80,7 +80,7 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector, self.reward_velvec = [], [], [], [], [], [], []
+        self.reward_distance, self.reward_euler, self.reward_contact, self.reward_fast, self.reward_velocity, self.reward_vector, self.reward_velvec, self.reward_acc = [], [], [], [], [], [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
@@ -107,6 +107,7 @@ class Monitor(gym.Wrapper):
         self.reward_velocity.append(info['reward_velocity'])
         self.reward_vector.append(info['reward_vector'])
         self.reward_velvec.append(info['reward_velvec'])
+        self.reward_acc.append(info['reward_acceleration'])
         if done:
             self.needs_reset = True
             ep_rew = sum(self.rewards)
@@ -118,11 +119,12 @@ class Monitor(gym.Wrapper):
             ep_rewVel = sum(self.reward_velocity)
             ep_rewVec = sum(self.reward_vector)
             ep_rewVV = sum(self.reward_velvec)
+            ep_rewAcc = sum(self.reward_acc)
             # ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
                        "rd": round(ep_rewDis, 6), "re": round(ep_rewEu, 6), "rc": round(ep_rewCon, 6),
                         "rf": round(ep_rewFas, 6), "rv": round(ep_rewVel, 6), "rvec": round(ep_rewVec, 6),
-                       "rvv": round(ep_rewVV, 6)}
+                       "rvv": round(ep_rewVV, 6), "racc": round(ep_rewAcc, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
             self.episode_rewards.append(ep_rew)
