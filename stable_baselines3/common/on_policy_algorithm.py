@@ -259,10 +259,21 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                 if len(self.ep_info_buffer) > 0 and len(self.ep_info_buffer[0]) > 0:
                     self.logger.record("rollout/ep_rew_mean", safe_mean([ep_info["r"] for ep_info in self.ep_info_buffer]))
                     self.logger.record("rollout/ep_len_mean", safe_mean([ep_info["l"] for ep_info in self.ep_info_buffer]))
+                    self.logger.record("rollout/ep_rew_pos_mean", safe_mean([ep_info["r_pos"] for ep_info in self.ep_info_buffer]))
+                    self.logger.record("rollout/ep_rew_rot_mean", safe_mean([ep_info["r_rot"] for ep_info in self.ep_info_buffer]))
+                    self.logger.record("rollout/ep_pen_rot_mean", safe_mean([ep_info["p_rot"] for ep_info in self.ep_info_buffer]))
+                    self.logger.record("rollout/ep_rew_time_mean", safe_mean([ep_info["r_time"] for ep_info in self.ep_info_buffer]))
                 self.logger.record("time/fps", fps)
                 self.logger.record("time/time_elapsed", int(time.time() - self.start_time), exclude="tensorboard")
                 self.logger.record("time/total_timesteps", self.num_timesteps, exclude="tensorboard")
                 self.logger.dump(step=self.num_timesteps)
+
+            # curriculum trick 2022/04/26
+            r_time_threshold = 50
+            if safe_mean([ep_info["r_time"] for ep_info in self.ep_info_buffer]) > r_time_threshold \
+                    and not self.env.env_method("check_curriculum_flag")[0]:
+                self.env.env_method("change_curriculum_flag", True)
+                callback.callbacks[0].eval_env.env_method("change_curriculum_flag", True)
 
             self.train()
 
