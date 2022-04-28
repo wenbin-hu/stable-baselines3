@@ -263,6 +263,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                     self.logger.record("rollout/ep_rew_rot_mean", safe_mean([ep_info["r_rot"] for ep_info in self.ep_info_buffer]))
                     self.logger.record("rollout/ep_pen_rot_mean", safe_mean([ep_info["p_rot"] for ep_info in self.ep_info_buffer]))
                     self.logger.record("rollout/ep_rew_time_mean", safe_mean([ep_info["r_time"] for ep_info in self.ep_info_buffer]))
+                    self.logger.record("rollout/ep_rew_con_mean", safe_mean([ep_info["r_con"] for ep_info in self.ep_info_buffer]))
                 self.logger.record("time/fps", fps)
                 self.logger.record("time/time_elapsed", int(time.time() - self.start_time), exclude="tensorboard")
                 self.logger.record("time/total_timesteps", self.num_timesteps, exclude="tensorboard")

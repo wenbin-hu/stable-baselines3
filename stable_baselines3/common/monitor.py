@@ -50,7 +50,7 @@ class Monitor(gym.Wrapper):
         self.info_keywords = info_keywords
         self.allow_early_resets = allow_early_resets
         self.rewards = None
-        self.rewards_rot, self.rewards_pos, self.penalty_rot, self.rewards_time = None, None, None, None
+        self.rewards_rot, self.rewards_pos, self.penalty_rot, self.rewards_time, self.rewards_con = None, None, None, None, None
         self.needs_reset = True
         self.episode_returns = []
         self.episode_lengths = []
@@ -71,7 +71,7 @@ class Monitor(gym.Wrapper):
                 "wrap your env with Monitor(env, path, allow_early_resets=True)"
             )
         self.rewards = []
-        self.rewards_rot, self.rewards_pos, self.penalty_rot, self.rewards_time = [], [], [], []
+        self.rewards_rot, self.rewards_pos, self.penalty_rot, self.rewards_time, self.rewards_con = [], [], [], [], []
         self.needs_reset = False
         for key in self.reset_keywords:
             value = kwargs.get(key)
@@ -95,6 +95,7 @@ class Monitor(gym.Wrapper):
         self.rewards_rot.append(info["r_rot"])
         self.penalty_rot.append(info["p_rot"])
         self.rewards_time.append(info["r_time"])
+        self.rewards_con.append(info["r_con"])
         if done:
             self.needs_reset = True
             ep_rew = sum(self.rewards)
@@ -102,10 +103,11 @@ class Monitor(gym.Wrapper):
             ep_rew_rot = sum(self.rewards_rot)
             ep_pen_rot = sum(self.penalty_rot)
             ep_rew_time = sum(self.rewards_time)
+            ep_rew_con = sum(self.rewards_con)
             ep_len = len(self.rewards)
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
                        "r_pos": round(ep_rew_pos, 6), "r_rot": round(ep_rew_rot, 6), "p_rot": round(ep_pen_rot, 6),
-                       "r_time": round(ep_rew_time, 6)}
+                       "r_time": round(ep_rew_time, 6), "r_con": round(ep_rew_con, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
             self.episode_returns.append(ep_rew)
@@ -193,7 +195,7 @@ class ResultsWriter:
         # Prevent newline issue on Windows, see GH issue #692
         self.file_handler = open(filename, "wt", newline="\n")
         self.file_handler.write("#%s\n" % json.dumps(header))
-        self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t", "r_pos", "r_rot", "p_rot", "r_time") + extra_keys)
+        self.logger = csv.DictWriter(self.file_handler, fieldnames=("r", "l", "t", "r_pos", "r_rot", "p_rot", "r_time", "r_con") + extra_keys)
         self.logger.writeheader()
         self.file_handler.flush()
 
