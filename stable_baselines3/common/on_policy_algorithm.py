@@ -10,7 +10,7 @@ from stable_baselines3.common.buffers import DictRolloutBuffer, RolloutBuffer
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from stable_baselines3.common.utils import obs_as_tensor, safe_mean
+from stable_baselines3.common.utils import obs_as_tensor, safe_mean, safe_std
 from stable_baselines3.common.vec_env import VecEnv
 
 
@@ -258,6 +258,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                 self.logger.record("time/iterations", iteration, exclude="tensorboard")
                 if len(self.ep_info_buffer) > 0 and len(self.ep_info_buffer[0]) > 0:
                     self.logger.record("rollout/ep_rew_mean", safe_mean([ep_info["r"] for ep_info in self.ep_info_buffer]))
+                    self.logger.record("rollout/ep_rew_std", safe_std([ep_info["r"] for ep_info in self.ep_info_buffer]))
                     self.logger.record("rollout/ep_len_mean", safe_mean([ep_info["l"] for ep_info in self.ep_info_buffer]))
                     self.logger.record("rollout/ep_rew_pos_mean", safe_mean([ep_info["r_pos"] for ep_info in self.ep_info_buffer]))
                     self.logger.record("rollout/ep_rew_rot_mean", safe_mean([ep_info["r_rot"] for ep_info in self.ep_info_buffer]))
