@@ -106,7 +106,7 @@ class Monitor(gym.Wrapper):
             ep_rew_con = sum(self.rewards_con)
             ep_len = len(self.rewards)
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6),
-                       "r_pos": round(ep_rew_pos, 6), "r_rot": round(ep_rew_rot, 6), "p_rot": round(ep_rew_vel, 6),
+                       "r_pos": round(ep_rew_pos, 6), "r_rot": round(ep_rew_rot, 6), "r_vel": round(ep_rew_vel, 6),
                        "r_time": round(ep_rew_time, 6), "r_con": round(ep_rew_con, 6)}
             for key in self.info_keywords:
                 ep_info[key] = info[key]
