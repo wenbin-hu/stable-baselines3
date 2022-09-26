@@ -270,8 +270,8 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                 self.logger.record("time/total_timesteps", self.num_timesteps, exclude="tensorboard")
                 self.logger.dump(step=self.num_timesteps)
 
-            # curriculum trick 2022/04/26
-            r_time_threshold = 50
+            # curriculum trick 2022/09/26
+            r_time_threshold = 100
             if safe_mean([ep_info["r_time"] for ep_info in self.ep_info_buffer]) > r_time_threshold \
                     and not self.env.env_method("check_curriculum_flag")[0]:
                 self.env.env_method("change_curriculum_flag", True)
